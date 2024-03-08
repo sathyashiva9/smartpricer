@@ -126,10 +126,17 @@ export async function untrackProductByEmail(productId: string, email: string) {
 
     // Remove the specified email from the users array
     product.users = product.users.filter((user: { email: string; }) => user.email !== email);
-
+    
     // Save the updated product
     await product.save();
     const emailContent=await generateEmailBody(product, "UNTRACKING");
+    if (product.users.length === 0) {
+      await Product.deleteOne({ _id: productId });
+      await sendEmail(emailContent,[email])
+      console.log("Product removed from database");
+      return; // Exit the function as product is already removed
+    }
+    
     await sendEmail(emailContent,[email])
   } catch (error) {
     console.error("Failed to untrack product:", error);

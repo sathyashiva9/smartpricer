@@ -96,19 +96,23 @@ const transporter = nodemailer.createTransport({
   },
   maxConnections: 1
 })
-
 export const sendEmail = async (emailContent: EmailContent, sendTo: string[]) => {
-  const mailOptions = {
-    // from: 'javascriptmastery@outlook.com',
-    from: '20b81a33a1@cvr.ac.in',
-    to: sendTo,
-    html: emailContent.body,
-    subject: emailContent.subject,
-  }
+  return new Promise((resolve, reject) => {
+    const mailOptions = {
+      from: '20b81a33a1@cvr.ac.in',
+      to: sendTo,
+      html: emailContent.body,
+      subject: emailContent.subject,
+    };
 
-  transporter.sendMail(mailOptions, (error: any, info: any) => {
-    if(error) return console.log(error);
-    
-    console.log('Email sent: ', info);
-  })
-}
+    transporter.sendMail(mailOptions, (error: any, info: any) => {
+      if (error) {
+        console.log(error);
+        reject(error);
+      } else {
+        console.log('Email sent: ', info);
+        resolve(info);
+      }
+    });
+  });
+};
